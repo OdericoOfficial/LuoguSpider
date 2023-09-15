@@ -9,6 +9,9 @@ from typing import Dict
 from ProblemSpider import ProblemSpider, OnSpiderCompleted, OnSpiderCompleting
 import tkinter.messagebox
 import subprocess as sp
+import win32api
+import win32con
+import win32job
 import os
 
 class BaseForm(Tk):
@@ -159,6 +162,12 @@ class LuoguForm(BaseForm):
         self.tk_check_button_lmiva0ho, self.__gpu = self.__tk_check_button_lmiva0ho(self.tk_frame__configContainer, appsettings['GPU']) 
         self.tk_table___logList = self.__tk_table___logList( self.tk_frame___chartContainer) 
         self.__event_bind()
+        # 用于解决python关闭后前端任然运行的问题，来自new bing
+        self.__job = win32job.CreateJobObject(None, '')
+        self.__extended_info = win32job.QueryInformationJobObject(self.__job, win32job.JobObjectExtendedLimitInformation)
+        self.__extended_info['BasicLimitInformation']['LimitFlags'] = win32job.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+        win32job.SetInformationJobObject(self.__job, win32job.JobObjectExtendedLimitInformation, self.__extended_info)
+
 
     def __inputInit(self, appsettings):
         self.tk_input__savePath.configure(state=NORMAL)
@@ -240,7 +249,10 @@ class LuoguForm(BaseForm):
                 json.dump(blazorSettings, fs)
 
             args = f"dotnet run --project {blazorPath} --urls http://localhost:{self.__port}"
-            sp.Popen(args, shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
+
+
+            proc = sp.Popen(args, shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
+            win32job.AssignProcessToJobObject(self.__job, proc._handle)            
             tkinter.messagebox.showinfo(message=f'前端已打开在 localhost:{self.__port}')
         except Exception as e:
             tkinter.messagebox.showerror(message=e)
