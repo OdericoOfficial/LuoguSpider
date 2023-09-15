@@ -8,7 +8,7 @@ using ModuleDistributor.Logging;
 namespace LuoguSpiderServer.Pages
 {
 #nullable disable
-    public partial class Explorer : ILoggerProxy
+    public partial class Explorer : ILoggerProxy<Explorer>
     {
         [Parameter]
         public string Id { get; set; }
@@ -34,7 +34,6 @@ namespace LuoguSpiderServer.Pages
             LuoguProblem problem = await Context.Set<LuoguProblem>().FirstOrDefaultAsync(item => item.Id == Id);
             if (problem is not null)
                 _source = Type == "solutions" ? problem.SolutionHtml : problem.ProblemHtml;
-            throw new ArgumentNullException("Problem cannot find.");
         }
     }
 }

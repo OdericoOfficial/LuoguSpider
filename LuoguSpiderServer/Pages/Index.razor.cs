@@ -4,12 +4,14 @@ using Masa.Blazor;
 using Masa.Blazor.Presets;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
+using ModuleDistributor.Logging;
 using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace LuoguSpiderServer.Pages
 {
-    public partial class Index
+#nullable disable
+    public partial class Index : ILoggerProxy<Index>
     {
         class Model
         {
@@ -47,21 +49,27 @@ namespace LuoguSpiderServer.Pages
         };
 
         [Inject]
-        public NavigationManager? Navigation { get; set; }
+        public NavigationManager Navigation { get; set; }
 
         [Inject]
-        public LuoguSpiderDbContext? Context { get; set; }
+        public LuoguSpiderDbContext Context { get; set; }
 
+        [Inject]
+        public ILogger<Index> Logger { get; set; }
+        ILogger ILoggerProxy.Logger { get => Logger; }
+
+        [ExLogging]
         private async Task OnSubmitClick()
         {
             _value = $"题目难度: {_model.Difficulty}, 标签: {_model.Keywords}, 关键词: {_model.Serach}";
-            _list = await Context!.Set<LuoguProblem>().Where(item => item.Difficulty.Contains(_model.Difficulty)
+            _list = await Context.Set<LuoguProblem>().Where(item => item.Difficulty.Contains(_model.Difficulty)
                             && item.Keywords.Contains(_model.Keywords)
                             && (item.Title.Contains(_model.Serach)
                             || item.Difficulty.Contains(_model.Serach)
                             || item.Keywords.Contains(_model.Serach))).OrderBy(item => item.Id).ToListAsync();
         }
-        
+
+        [ExLogging]
         protected override async Task OnInitializedAsync()
         {
             if (Context is not null)
