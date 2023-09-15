@@ -15,10 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModuleDistributor.EntityFra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModuleDistributor.Logging", "Module\ModuleDistributor.Logging\ModuleDistributor.Logging.csproj", "{986A28A6-64F8-4A6A-A99A-EF7DF23A8777}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModuleDistributor.Repository", "Module\ModuleDistributor.Repository\ModuleDistributor.Repository.csproj", "{A09CB9AB-33FE-4A91-97B3-DAD01B635C2D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModuleDistributor.Repository.Abstractions", "Module\ModuleDistributor.Repository.Abstractions\ModuleDistributor.Repository.Abstractions.csproj", "{F8F4D895-D96A-446D-BC13-476356578022}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModuleDistributor.Serilog", "Module\ModuleDistributor.Serilog\ModuleDistributor.Serilog.csproj", "{36163616-1200-4088-A401-20FC49A01F5A}"
 EndProject
 Global
@@ -49,14 +45,6 @@ Global
 		{986A28A6-64F8-4A6A-A99A-EF7DF23A8777}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{986A28A6-64F8-4A6A-A99A-EF7DF23A8777}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{986A28A6-64F8-4A6A-A99A-EF7DF23A8777}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A09CB9AB-33FE-4A91-97B3-DAD01B635C2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A09CB9AB-33FE-4A91-97B3-DAD01B635C2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A09CB9AB-33FE-4A91-97B3-DAD01B635C2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A09CB9AB-33FE-4A91-97B3-DAD01B635C2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F8F4D895-D96A-446D-BC13-476356578022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F8F4D895-D96A-446D-BC13-476356578022}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F8F4D895-D96A-446D-BC13-476356578022}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F8F4D895-D96A-446D-BC13-476356578022}.Release|Any CPU.Build.0 = Release|Any CPU
 		{36163616-1200-4088-A401-20FC49A01F5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36163616-1200-4088-A401-20FC49A01F5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36163616-1200-4088-A401-20FC49A01F5A}.Release|Any CPU.ActiveCfg = Release|Any CPU

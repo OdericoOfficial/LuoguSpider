@@ -4,18 +4,20 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	<PublishAot>false</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Module\ModuleDistributor.DependencyInjection\ModuleDistributor.DependencyInjection.csproj" />
     <ProjectReference Include="..\Module\ModuleDistributor.EntityFrameworkCore\ModuleDistributor.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Module\ModuleDistributor.Logging\ModuleDistributor.Logging.csproj" />
-    <ProjectReference Include="..\Module\ModuleDistributor.Repository\ModuleDistributor.Repository.csproj" />
     <ProjectReference Include="..\Module\ModuleDistributor.Serilog\ModuleDistributor.Serilog.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Masa.Blazor" Version="1.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.11" />
+    <PackageReference Include="Rougamo.Fody" Version="1.4.1" />
   </ItemGroup>
 
 </Project>

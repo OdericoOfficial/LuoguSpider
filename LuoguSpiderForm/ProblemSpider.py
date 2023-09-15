@@ -1,5 +1,5 @@
 ﻿# 导入selenium
-from re import S
+import tkinter
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -26,27 +26,34 @@ __luoguSolutionPath = 'https://www.luogu.com.cn/problem/solution/'
 __luoguListPath = 'https://www.luogu.com.cn/problem/list?page='
 __luoguAuthPath = 'https://www.luogu.com.cn/auth/login'
 
+OnSpiderCompleting = []
+OnSpiderCompleted = []
 
-def ProblemSpider(account, password, savePath, edgePath, dbPath, gpu):
+def ProblemSpider(account, password, savePath, edgePath, gpu, threads, cookies = None):
     # 创建锁
     lock = threading.Lock()
     
     # 获取cookies
-    cookies = __getCookiesByOcr(account, password, edgePath, gpu)
+    if cookies == None:
+        cookies = __getCookiesByOcr(account, password, edgePath, gpu)
+    tkinter.messagebox.showinfo(message='登录完成')
     
     # 创建数据库
+    dbPath = os.path.join(savePath, 'luogu.db')
     __createTable(dbPath)
     
     start = 1000
+    adder = int(50 / threads)
+    distance = 50 - adder * threads
     # 启动线程池
     with ThreadPoolExecutor() as task:
-        for i in range(0, 10):
-            task.submit(__spiderTask, start, 5, savePath, edgePath, dbPath, cookies, lock)
-            start += 5
+        for i in range(0, threads):
+            task.submit(__spiderTask, start, adder, savePath, edgePath, dbPath, cookies, lock)
+            start += adder
+        if distance > 0:
+            task.submit(__spiderTask, start, distance, savePath, edgePath, dbPath, cookies, lock);
             
-def __createTable(dbPath):  
-    if os.path.exists(dbPath):
-        os.remove(dbPath)
+def __createTable(dbPath):
     connect = sqlite3.connect(dbPath)
     connect.execute(
         """CREATE TABLE LuoguProblem (
@@ -54,21 +61,19 @@ def __createTable(dbPath):
         Title TEXT,
         Difficulty TEXT,
         Keywords TEXT,
-        Path TEXT)""")
+        ProblemHtml TEXT,
+        SolutionHtml TEXT)""")
     connect.commit()
     connect.close()
     
-def __insertLine(problemDict, dbPath, lock):
-    with lock:
-        connect = sqlite3.connect(dbPath)
-        connect.execute(
-            f"""INSERT INTO LuoguProblem (Id, Title, Difficulty, Keywords, Path)
-                VALUES ("{problemDict.get('Id')}", "{problemDict.get('Title')}",
-                        "{problemDict.get('Difficulty')}", "{problemDict.get('Keywords')}",
-                        "{problemDict.get('Path')}")""")
-        connect.commit()
-        connect.close()
-
+def __insertLine(problemDict, dbPath):
+    connect = sqlite3.connect(dbPath)
+    connect.execute("INSERT INTO LuoguProblem (Id, Title, Difficulty, Keywords, ProblemHtml, SolutionHtml) VALUES (?, ?, ?, ?, ?, ?)",
+                    (problemDict.get('Id'), problemDict.get('Title'), problemDict.get('Difficulty'),
+                        problemDict.get('Keywords'), problemDict.get('ProblemHtml'), problemDict.get('SolutionHtml')))
+    connect.commit()
+    connect.close()
+    
 def __getCookiesByOcr(account, password, edgePath, gpu):
     # 打开登录网站并等待加载
     driver = __getHeadLessDriver(edgePath)
@@ -158,8 +163,8 @@ def __internalTask(problemId, savePath, driver, dbPath, cookies, lock):
     solutionSoup = __solutionTask(driver, problemId, cookies)
 
     # 获取两个页面的信息
-    (problem, problemDict) = __solveProblemTask(problemSoup)
-    solution = __solveSolutionTask(solutionSoup)
+    problemDict = __solveProblemTask(problemSoup)
+    problemDict['SolutionHtml'] = __solveSolutionTask(solutionSoup)
 
     # 拼接文件名
     problemDict['Id'] = problemId
@@ -176,20 +181,25 @@ def __internalTask(problemId, savePath, driver, dbPath, cookies, lock):
     problemDir = os.path.join(difficultDir, problemDirName)
     if not os.path.exists(problemDir):
         os.mkdir(problemDir)
-    problemDict['Path'] = problemDict
     
+    h2t = HTML2Text()
+
     # 写入文件
     problemFile = os.path.join(problemDir, problemFileName)
     if not os.path.exists(problemFile):
         with open(problemFile, 'w', encoding='utf-8') as fs:
-            fs.write(problem)
+            fs.write(h2t.handle(problemDict['ProblemHtml']))
 
     solutionFile = os.path.join(problemDir, solutionFileName)
     if not os.path.exists(solutionFile):
         with open(solutionFile, 'w', encoding='utf-8') as fs:
-            fs.write(solution)
+            fs.write(h2t.handle(problemDict['SolutionHtml']))
     
-    __insertLine(problemDict, dbPath, lock)
+    with lock:
+        __insertLine(problemDict, dbPath)
+        for event in OnSpiderCompleted:
+            event(problemId)
+            
     time.sleep(random.uniform(2, 3))
 
 def __solutionTask(driver, problemId, cookies):
@@ -208,8 +218,8 @@ def __solveSolutionTask(soup):
     # 获取题解
     mainContainer = soup.find('section', class_ = 'main').find('div', 'block')
     fristSolution = mainContainer.find('div', class_ = 'row-wrap').find_all('div', class_ = 'item-row')[0]
-    solution = fristSolution.find('div', class_ = 'main').find('div', class_ = 'marked')
-    return HTML2Text().handle(str(solution))
+    solution = fristSolution.find('div', class_ = 'main')
+    return str(solution)
 
 def __problemTask(driver, problemId):
     # 打开题目页面
@@ -234,7 +244,7 @@ def __solveProblemTask(soup):
     
     # 获取问题
     mainContainer = soup.find('section', class_ = 'main').find('div', class_ = 'card problem-card padding-default').find_all('div')[1]
-    problem = HTML2Text().handle(str(mainContainer))
+    problem = str(mainContainer)
     
     # 获取标题
     title = soup.find('h1', class_ = 'lfe-h1').find('span')['title']
@@ -246,21 +256,26 @@ def __solveProblemTask(soup):
     for item in keyContainer.find_all('span'):
         keywords.append(item.text.strip())
     
-    return (problem, { 'Id': '',
-                       'Title': title,
-                       'Difficulty': difficulty,
-                       'Keywords': ' '.join(keywords),
-                       'Path': ''})
+    return { 'Id': '',
+             'Title': title,
+             'Difficulty': difficulty,
+             'Keywords': ' '.join(keywords),
+             'ProblemHtml': problem,
+             'SolutionHtml': ''}
     
 def __spiderTask(start, adder, savePath, edgePath, dbPath, cookies, lock):
-    path = 'https://www.luogu.com.cn/'
-    driver = __getHeadLessDriver(edgePath)
-    driver.get(path)
-    for cookie in cookies:
-        driver.add_cookie(cookie)
-    driver.get(path)
+    try:
+        path = 'https://www.luogu.com.cn/'
+        driver = __getHeadLessDriver(edgePath)
+        driver.get(path)
+        for cookie in cookies:
+            driver.add_cookie(cookie)
+        driver.get(path)
     
-    for i in range(start, start + adder):
-        print(f'P{str(i)}')
-        __internalTask(f'P{str(i)}', savePath, driver, dbPath, cookies, lock)
-    driver.quit()
+        for i in range(start, start + adder):
+            for event in OnSpiderCompleting:
+                event(f'P{str(i)}')
+            __internalTask(f'P{str(i)}', savePath, driver, dbPath, cookies, lock)
+        driver.quit()
+    except Exception as e:
+        tkinter.messagebox.showinfo(message=e)

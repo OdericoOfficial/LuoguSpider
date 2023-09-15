@@ -1,0 +1,29 @@
+﻿@page "/{type}/{id}"
+
+<PageTitle>@Id</PageTitle>
+<MCard Style="width: 100vw; color:white"
+       Elevation="4">
+    <MCardText Class="black--text;">
+        @(new MarkupString(_source))
+    </MCardText>
+</MCard>
+
+<style>
+     .katex {
+         font: normal 1.21em KaTeX_Main, Times New Roman, serif;
+         line-height: 1.2;
+         text-indent: 0;
+         text-rendering: auto;
+         border-color: currentColor;
+     }
+
+     .katex .katex-mathml {
+        position: absolute;
+        clip: rect(1px, 1px, 1px, 1px);
+        padding: 0;
+        border: 0;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+    }
+</style>

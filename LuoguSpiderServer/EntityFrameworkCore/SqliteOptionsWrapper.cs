@@ -11,8 +11,6 @@ namespace LuoguSpiderServer.EntityFrameworkCore
             => OptionsAction = ConfigureDbContextOptions;
 
         private void ConfigureDbContextOptions(IServiceProvider services, DbContextOptionsBuilder options)
-        {
-
-        }
+            => options.UseSqlite(services.GetRequiredService<IConfiguration>().GetConnectionString("Sqlite"));
     }
 }

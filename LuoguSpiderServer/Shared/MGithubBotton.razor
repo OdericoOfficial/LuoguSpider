@@ -1,0 +1,26 @@
+﻿@inject NavigationManager Navigation
+
+<MTooltip Bottom>
+    <ActivatorContent>
+        <FabTransition>
+            <MButton Color="deep-purple accent-2"
+                     OnClick="NavigateToGithub"
+                     @attributes="@context.Attrs"
+                      Fab
+                      Dark
+                      Absolute
+                      Bottom
+                      Right>
+                <MIcon>mdi-github</MIcon>
+            </MButton>
+        </FabTransition>
+    </ActivatorContent>
+    <ChildContent>
+        <span>前往Github主页</span>
+    </ChildContent>
+</MTooltip>
+
+@code{
+    private void NavigateToGithub()
+        => Navigation.NavigateTo("https://github.com/OdericoOfficial");
+}

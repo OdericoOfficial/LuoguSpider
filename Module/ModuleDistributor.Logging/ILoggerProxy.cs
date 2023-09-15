@@ -11,4 +11,9 @@ namespace ModuleDistributor.Logging
     {
         ILogger Logger { get; }
     }
+
+    public interface ILoggerProxy<T> : ILoggerProxy
+    {
+        new ILogger<T> Logger { get; set; }
+    }
 }

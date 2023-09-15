@@ -1,3 +1,44 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+<MApp>
+    <PPageTabsProvider>
+        <MSystemBar App
+                     Color="deep-purple">
+             <MSpacer></MSpacer>
+             <MIcon Color="white">mdi-square-outline</MIcon>
+             <MIcon Color="white">mdi-circle-outline</MIcon>
+             <MIcon Color="white">mdi-triangle-outline</MIcon>
+         </MSystemBar>
+         <MAppBar Outlined
+                  Dark
+                  Dense
+                  App
+                  Color="deep-purple lighten-1"
+                  Flat>
+            <MAppBarNavIcon @onclick="NavigateTo">
+                <span class="font-weight-medium">@("Home")</span>
+            </MAppBarNavIcon>
+            <PPageTabs AskBeforeClosing = "false"
+                       Ripple
+                       TabOptions="TabOptions"
+                       @ref="_pageTabs"></PPageTabs>
+             <MGithubBotton></MGithubBotton>
+        </MAppBar>
+        <MMain Class="grey lighten-2">
+            <PPageContainer PageTabs="_pageTabs">
+                 <MContainer Fluid>
+                    @Body
+                </MContainer>
+             </PPageContainer>
+        </MMain>
+        <MFooter Padless
+                 Elevation="4"
+                 App
+                 Color="deep-purple lighten-2">
+             <MSpacer></MSpacer>
+             <PBlockText Secondary="@($"Copyright © {DateTime.Now.Year} Presented by Oderico_Official, Powered by Blazor Server, All Rights Reserved.")"
+                         SecondaryStyle="color: white"></PBlockText>
+             <MSpacer></MSpacer>
+         </MFooter>
+    </PPageTabsProvider>
+</MApp>

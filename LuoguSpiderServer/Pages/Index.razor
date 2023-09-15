@@ -1,1 +1,85 @@
 ﻿@page "/"
+
+<MCard Style="width: 100vw; color:white"
+       Elevation="4">
+    <MCardTitle>
+        <span style="color:black">题目列表</span>
+    </MCardTitle>
+    <MCardText>
+        <MRow>
+            <MCol Cols="9"
+                  Md="3">
+                <MSelect @bind-Value="_model.Difficulty"
+                         Items="@_items"
+                         Label="题目难度"
+                         TextColor="black"
+                         Outlined
+                          ItemText="u => u"
+                          ItemValue="u => u"></MSelect>
+             </MCol>
+             <MCol Cols="9"
+                   Md="3">
+                 <MTextField @bind-Value="_model.Keywords"
+                             TextColor="black"
+                            Outlined
+                             Label="标签"></MTextField>
+             </MCol>
+             <MCol Cols="9"
+                   Md="3">
+                 <MTextField @bind-Value="_model.Serach"
+                            Outlined
+                             TextColor="black"
+                             Label="关键词"></MTextField>
+             </MCol>
+             <MCol Cols="9"
+                   Md="3">
+                 <MButton Type="submit"
+                          OnClick="OnSubmitClick">搜索</MButton>
+             </MCol>
+         </MRow>
+         <MRow>
+             <MTextField Value="_value"
+                         Label="已选择"
+                        Outlined
+                        Readonly>
+            </MTextField>
+        </MRow>
+        <MRow>
+            <MDataTable Headers="_headers"
+                        Items="_list"
+                        ItemsPerPage="5"
+                        Class="elevation-1"
+                        FixedRight
+                         ItemKey="r => r.Id"
+                         Width="@("120%")"
+                         FooterProps="@(props => {
+                        props.ShowFirstLastPage = true;
+                        props.ShowCurrentPage = true;
+                        props.ShowFirstLastPage = true;
+                        props.FirstIcon = "mdi-arrow-collapse-left";
+                        props.LastIcon = "mdi-arrow-collapse-right";
+                        props.PrevIcon = "mdi-minus";
+                        props.NextIcon = "mdi-plus";})">
+                 <ItemColContent>
+                     @if (context.Header.Value == "Actions")
+                    {
+                        <MButton XSmall
+                                  Class="mr-2"
+                                  Href="@($"/problems/{context.Item.Id}")">
+                             题目
+                         </MButton>
+                        <MButton XSmall
+                                  Class="mr-2"
+                                  Href="@($"/solutions/{context.Item.Id}")">
+                             题解
+                         </MButton>
+                    }
+                    else
+                    {
+                        @context.Value
+                    }
+                </ItemColContent>
+            </MDataTable>
+        </MRow>
+    </MCardText>
+</MCard>
