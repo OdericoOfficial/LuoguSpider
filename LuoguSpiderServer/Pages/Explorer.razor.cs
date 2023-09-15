@@ -16,6 +16,9 @@ namespace LuoguSpiderServer.Pages
         [Parameter]
         public string Type { get; set; }
 
+        public string Name
+            => Type == "solutions" ? "题解" : "题目";
+
         [Inject]
         public ILogger<Explorer> Logger { get; set; }
         ILogger ILoggerProxy.Logger { get => Logger; }
